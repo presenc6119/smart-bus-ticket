@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Uni Bus Booking</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Add this at the top of your <body> -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <span class="navbar-brand">Bus Booking System</span>
+            <div class="navbar-links">
+                <a href="index.html">Home</a>
+                <a href="schedule.html">Bus Schedule</a>
+                <a href="#" id="logoutNav" class="hidden">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <!-- Registration Form -->
+        <div id="register" class="hidden">
+            <h2>Register</h2>
+            <input id="regStudentId" placeholder="Student ID (e.g. s001)" /><br>
+            <input id="regPassword" type="password" placeholder="Password" /><br>
+            <button type="button" onclick="register()">Register</button>
+            <button type="button" onclick="showLogin()">Back to Login</button>
+            <div id="registerError" style="color:red"></div>
+            <div id="registerSuccess" style="color:green"></div>
+        </div>
+        <div id="login">
+            <h2>Student Login</h2>
+            <input id="studentId" placeholder="Student ID (e.g. s001)" /><br>
+            <input id="password" type="password" placeholder="Password" /><br>
+            <button onclick="login()">Login</button>
+            <button type="button" onclick="showRegister()">Register</button>
+            <div id="loginError" style="color:red"></div>
+        </div>
+        <div id="booking" class="hidden">
+            <h2>Find a Bus</h2>
+            <select id="from" style="width:100%;margin-bottom:8px;">
+                <option value="">From</option>
+            </select>
+            <select id="to" style="width:100%;margin-bottom:16px;">
+                <option value="">To</option>
+            </select>
+            <input id="date" type="date" style="width:100%;margin-bottom:16px;" /><br>
+            <button type="button" id="findRoutesBtn">Find Bus Routes</button>
+            <div id="findMsg"></div>
+        </div>
+        <div id="bookings" class="hidden">
+            <h2>Your Bookings</h2>
+            <ul id="bookingList"></ul>
+        </div>
+        <button id="logoutBtn" class="hidden" onclick="logout()">Logout</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

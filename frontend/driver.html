@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VUS Driver GPS Demo</title>
+</head>
+<body>
+  <h2>Send My Location</h2>
+  <button onclick="sendLocation()">Send Location</button>
+  <div id="status"></div>
+  <script>
+    function sendLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          fetch('http://localhost:3001/api/gps', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              busId: 'bus1', // or select bus
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude
+            })
+          }).then(() => {
+            document.getElementById('status').innerText = 'Location sent!';
+          });
+        });
+      } else {
+        alert('Geolocation not supported');
+      }
+    }
+  </script>
+</body>
+</html>
