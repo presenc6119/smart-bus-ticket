@@ -38,40 +38,20 @@
   </div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    // Center on a default location (update as needed)
-    var map = L.map('map').setView([0, 0], 15);
+    // BUP coordinates
+    const BUP_COORDS = [23.813380, 90.424620];
+
+    // Initialize map centered on BUP
+    var map = L.map('map').setView(BUP_COORDS, 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19
     }).addTo(map);
-    var marker = L.marker([0, 0]).addTo(map).bindPopup("Late Shuttle Bus");
 
-    // Replace with your actual BUP coordinates
-    const BUP_COORDS = [23.813380, 90.424620];
+    // Marker for BUP
+    L.marker(BUP_COORDS).addTo(map).bindPopup("BUP (Bangladesh University of Professionals)").openPopup();
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (pos) {
-        const userLatLng = [pos.coords.latitude, pos.coords.longitude];
-
-        // Add marker for user
-        L.marker(userLatLng).addTo(map).bindPopup("You are here").openPopup();
-
-        // Draw route from user to BUP
-        L.Routing.control({
-          waypoints: [
-            L.latLng(userLatLng[0], userLatLng[1]),
-            L.latLng(BUP_COORDS[0], BUP_COORDS[1])
-          ],
-          routeWhileDragging: false,
-          draggableWaypoints: false,
-          addWaypoints: false
-        }).addTo(map);
-
-      }, function () {
-        alert("Could not get your location.");
-      });
-    } else {
-      alert("Geolocation is not supported by your browser.");
-    }
+    // Marker for Late Shuttle (updates live)
+    var busMarker = L.marker([0, 0]).addTo(map).bindPopup("Late Shuttle Bus");
 
     function updateLocation() {
       fetch('/api/gps/bus6')
@@ -80,9 +60,8 @@
           return res.json();
         })
         .then(loc => {
-          marker.setLatLng([loc.lat, loc.lng]);
-          map.setView([loc.lat, loc.lng]);
-          marker.getPopup().setContent("Late Shuttle Bus<br>Last updated: " + new Date(loc.time).toLocaleTimeString());
+          busMarker.setLatLng([loc.lat, loc.lng]);
+          busMarker.getPopup().setContent("Late Shuttle Bus<br>Last updated: " + new Date(loc.time).toLocaleTimeString());
           document.getElementById('status').innerText = "";
         })
         .catch(() => {
@@ -93,6 +72,6 @@
     setInterval(updateLocation, 3000);
     updateLocation();
   </script>
-  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 </body>
+
 </html>
