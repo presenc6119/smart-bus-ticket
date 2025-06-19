@@ -15,6 +15,9 @@ function to24Hour(time12h) {
 
 const app = express();
 app.use(express.static('public'));
+app.use(cors());
+app.use(bodyParser.json());
+
 const db = new sqlite3.Database('./bus_booking.db');
 
 const bookingQueue = [];
@@ -79,6 +82,7 @@ function processBookingQueue() {
 
 app.post('/api/gps', (req, res) => {
     const { busId, lat, lng } = req.body;
+    console.log('Received GPS:', busId, lat, lng); // For debugging
     if (!busId || !lat || !lng) return res.status(400).json({ error: 'Missing data' });
     latestLocations[busId] = { lat, lng, time: Date.now() };
     res.json({ success: true });
@@ -89,9 +93,6 @@ app.get('/api/gps/:busId', (req, res) => {
     if (!loc) return res.status(404).json({ error: 'No location' });
     res.json(loc);
 });
-
-app.use(cors());
-app.use(bodyParser.json());
 
 // Create tables
 // filepath: /home/presenc6/projects/test/bus-booking-system/backend/app.js
