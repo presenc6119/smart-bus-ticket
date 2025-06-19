@@ -2,6 +2,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const bodyParser = require('body-parser');
+app.use(express.static('public'));
 let latestLocations = {}; // { busId: {lat, lng, time} }
 
 function to24Hour(time12h) {
