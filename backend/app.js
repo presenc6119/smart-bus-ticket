@@ -2,7 +2,6 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-app.use(express.static('public'));
 let latestLocations = {}; // { busId: {lat, lng, time} }
 
 function to24Hour(time12h) {
@@ -15,6 +14,7 @@ function to24Hour(time12h) {
 }
 
 const app = express();
+app.use(express.static('public'));
 const db = new sqlite3.Database('./bus_booking.db');
 
 const bookingQueue = [];

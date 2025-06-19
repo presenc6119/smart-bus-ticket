@@ -5,7 +5,7 @@ let busList = [];
 
 
 function populateBusDropdown() {
-    fetch('http://localhost:3001/api/buses')
+    fetch('/api/buses')
         .then(res => res.json())
         .then(buses => {
             busList = buses;
@@ -141,7 +141,7 @@ function register() {
         return;
     }
 
-    fetch('http://localhost:3001/api/register', {
+    fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, password })
@@ -162,7 +162,7 @@ function register() {
 function login() {
     const id = document.getElementById('studentId').value;
     const password = document.getElementById('password').value;
-    fetch('http://localhost:3001/api/login', {
+    fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, password })
@@ -208,7 +208,7 @@ function bookBus() {
         document.getElementById('bookMsg').innerText = 'From and To cannot be the same.';
         return;
     }
-    fetch('http://localhost:3001/api/book', {
+    fetch('/api/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ student_id: studentId, bus, date, seat, from, to })
@@ -240,7 +240,7 @@ function to24Hour(time12h) {
 }
 
 function loadBookings() {
-    fetch(`http://localhost:3001/api/bookings/${studentId}`)
+    fetch(`/api/bookings/${studentId}`)
         .then(res => res.json())
         .then(bookings => {
             const list = document.getElementById('bookingList');
@@ -283,7 +283,7 @@ function loadBookings() {
                     cancelBtn.style.marginLeft = '10px';
                     cancelBtn.onclick = function () {
                         if (confirm('Are you sure you want to cancel this booking?')) {
-                            fetch(`http://localhost:3001/api/bookings/${b.id}`, { method: 'DELETE' })
+                            fetch(`/api/bookings/${b.id}`, { method: 'DELETE' })
                                 .then(res => res.json())
                                 .then(data => {
                                     if (data.success) {
@@ -305,7 +305,7 @@ function loadBookings() {
     const bus = document.getElementById('bus').value;
     const date = document.getElementById('date').value;
     if (bus && date) {
-        fetch(`http://localhost:3001/api/bookings/all?bus=${encodeURIComponent(bus)}&date=${encodeURIComponent(date)}`)
+        fetch(`/api/bookings/all?bus=${encodeURIComponent(bus)}&date=${encodeURIComponent(date)}`)
             .then(res => res.json())
             .then(allBookings => {
                 const bookedSeats = allBookings.map(b => Number(b.seat)).filter(Boolean);

@@ -7,7 +7,7 @@ const date = urlParams.get('date');
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    fetch('http://localhost:3001/api/buses')
+    fetch('/api/buses')
         .then(res => res.json())
         .then(buses => {
             const routesList = document.getElementById('routesList');
@@ -41,12 +41,12 @@ function showSeating(busId) {
     document.getElementById('bookMsg').innerText = '';
     document.getElementById('selectedSeat').value = '';
 
-    fetch('http://localhost:3001/api/buses')
+    fetch('/api/buses')
         .then(res => res.json())
         .then(buses => {
             const bus = buses.find(b => b.id === busId);
             // Fetch booked seats for this bus and date
-            fetch(`http://localhost:3001/api/bookings/all?bus=${encodeURIComponent(busId)}&date=${encodeURIComponent(date)}`)
+            fetch(`/api/bookings/all?bus=${encodeURIComponent(busId)}&date=${encodeURIComponent(date)}`)
                 .then(res => res.json())
                 .then(allBookings => {
                     const bookedSeats = allBookings.map(b => Number(b.seat)).filter(Boolean);
@@ -65,7 +65,7 @@ function showSeating(busId) {
                     document.getElementById('bookMsg').innerText = 'Please login first.';
                     return;
                 }
-                fetch('http://localhost:3001/api/book', {
+                fetch('/api/book', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
