@@ -1,3 +1,4 @@
+<!-- drivers.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,32 +9,37 @@
 <body>
   <div class="container">
     <h2>Late Shuttle Driver GPS</h2>
-    <button onclick="sendLocation()">Send My Location</button>
     <div id="status"></div>
   </div>
   <script>
-    function sendLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(pos) {
-          fetch('/api/gps', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              busId: 'bus6', // Always associate with Late Shuttle
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude
-            })
-          }).then(() => {
-            document.getElementById('status').innerText = 'Location sent!';
-          }).catch(() => {
-            document.getElementById('status').innerText = 'Failed to send location.';
-          });
-        }, function() {
-          document.getElementById('status').innerText = 'Unable to get location.';
-        });
-      } else {
-        alert('Geolocation not supported');
-      }
+    function sendLocation(lat, lng) {
+      fetch('/api/gps', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          busId: 'bus6',
+          lat: lat,
+          lng: lng
+        })
+      }).then(() => {
+        document.getElementById('status').innerText = 'Location sent: ' + lat + ', ' + lng;
+      }).catch(() => {
+        document.getElementById('status').innerText = 'Failed to send location.';
+      });
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(function(pos) {
+        sendLocation(pos.coords.latitude, pos.coords.longitude);
+      }, function() {
+        document.getElementById('status').innerText = 'Unable to get location.';
+      }, {
+        enableHighAccuracy: true,
+        maximumAge: 10000,
+        timeout: 10000
+      });
+    } else {
+      document.getElementById('status').innerText = 'Geolocation not supported';
     }
   </script>
 </body>
