@@ -1,27 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>VUS Driver GPS Demo</title>
+  <meta charset="UTF-8">
+  <title>Late Shuttle Driver GPS</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h2>Send My Location</h2>
-  <button onclick="sendLocation()">Send Location</button>
-  <div id="status"></div>
+  <div class="container">
+    <h2>Late Shuttle Driver GPS</h2>
+    <button onclick="sendLocation()">Send My Location</button>
+    <div id="status"></div>
+  </div>
   <script>
     function sendLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(pos) {
-          fetch('http://localhost:3001/api/gps', {
+          fetch('/api/gps', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              busId: 'bus1', // or select bus
+              busId: 'bus6', // Always associate with Late Shuttle
               lat: pos.coords.latitude,
               lng: pos.coords.longitude
             })
           }).then(() => {
             document.getElementById('status').innerText = 'Location sent!';
+          }).catch(() => {
+            document.getElementById('status').innerText = 'Failed to send location.';
           });
+        }, function() {
+          document.getElementById('status').innerText = 'Unable to get location.';
         });
       } else {
         alert('Geolocation not supported');
