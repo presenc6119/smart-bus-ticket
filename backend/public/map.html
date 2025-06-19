@@ -1,29 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>VUS Bus Location</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>#map { height: 400px; }</style>
+    <meta charset="UTF-8">
+    <title>Late Shuttle Live Map</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map { height: 400px; margin-top: 24px; }
+        .container { max-width: 700px; margin: 40px auto; }
+    </style>
 </head>
 <body>
-  <h2>Bus Location</h2>
-  <div id="map"></div>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    var map = L.map('map').setView([0,0], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    var marker = L.marker([0,0]).addTo(map);
+    <nav class="navbar">
+        <div class="navbar-container">
+            <span class="navbar-brand">VUS Booking System</span>
+            <div class="navbar-links">
+                <a href="index.html">Home</a>
+                <a href="schedule.html">VUS Schedule</a>
+                <a href="map.html">Live Map</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h2>Late Shuttle - Live Location</h2>
+        <div id="map"></div>
+        <div id="status"></div>
+    </div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Center on a default location (update as needed)
+        var map = L.map('map').setView([0, 0], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+        var marker = L.marker([0, 0]).addTo(map).bindPopup("Late Shuttle Bus");
 
-    function update() {
-      fetch('http://localhost:3001/api/gps/bus1')
-        .then(res => res.json())
-        .then(loc => {
-          marker.setLatLng([loc.lat, loc.lng]);
-          map.setView([loc.lat, loc.lng]);
-        });
-    }
-    setInterval(update, 3000);
-    update();
-  </script>
+        function updateLocation() {
+            fetch('/api/gps/bus6')
+                .then(res => {
+                    if (!res.ok) throw new Error("No location yet");
+                    return res.json();
+                })
+                .then(loc => {
+                    marker.setLatLng([loc.lat, loc.lng]);
+                    map.setView([loc.lat, loc.lng]);
+                    marker.getPopup().setContent("Late Shuttle Bus<br>Last updated: " + new Date(loc.time).toLocaleTimeString());
+                    document.getElementById('status').innerText = "";
+                })
+                .catch(() => {
+                    document.getElementById('status').innerText = "No location data yet for Late Shuttle.";
+                });
+        }
+
+        setInterval(updateLocation, 3000);
+        updateLocation();
+    </script>
 </body>
 </html>
