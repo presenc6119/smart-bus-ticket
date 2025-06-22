@@ -122,7 +122,6 @@ function showLogin() {
     document.getElementById('login').classList.remove('hidden');
 }
 
-// Registration handler
 function register() {
     const id = document.getElementById('regStudentId').value.trim();
     const password = document.getElementById('regPassword').value;
@@ -131,7 +130,6 @@ function register() {
     errorDiv.innerText = '';
     successDiv.innerText = '';
 
-    // Validate ID: must be s001 to s100
     if (!/^s(0[0-9][1-9]|0[1-9][0-9]|100)$/.test(id)) {
         errorDiv.innerText = 'Student ID must be from s001 to s100.';
         return;
@@ -225,7 +223,6 @@ function bookBus() {
 }
 
 function to24Hour(time12h) {
-    // Example input: "08:00 AM" or "03:30 PM"
     const [time, modifier] = time12h.split(' ');
     let [hours, minutes] = time.split(':');
     hours = parseInt(hours, 10);
@@ -235,7 +232,6 @@ function to24Hour(time12h) {
     if (modifier === 'AM' && hours === 12) {
         hours = 0;
     }
-    // Pad with zeros
     return `${hours.toString().padStart(2, '0')}:${minutes}:00`;
 }
 
@@ -246,38 +242,33 @@ function loadBookings() {
             const list = document.getElementById('bookingList');
             list.innerHTML = '';
             const now = new Date();
-            const bufferMs = 10 * 60 * 1000; // 10 minutes in milliseconds
+            const bufferMs = 10 * 60 * 1000;
             const nowWithBuffer = new Date(now.getTime() - bufferMs);
             bookings.forEach(b => {
                 const bus = busList.find(bus => bus.id === b.bus);
                 if (!bus) return;
-
-                // Find the index of the "to" stop for this booking
                 const toIdx = bus.stops.indexOf(b.to_stop);
-                let endTime = bus.time; // fallback to bus start time
+                let endTime = bus.time;
                 if (toIdx !== -1 && bus.schedule[toIdx]) {
                     endTime = bus.schedule[toIdx];
                 }
-                // Convert to 24-hour format
+
                 let endDateTime = new Date(`${b.date}T${to24Hour(endTime)}`);
                 if (isNaN(endDateTime.getTime())) {
-                    // Show invalid bookings for debugging
                     const li = document.createElement('li');
                     li.innerText = `Bus: ${getBusDisplay(b.bus)}, Date: ${b.date}, From: ${b.from_stop}, To: ${b.to_stop}, Seat: ${b.seat || 'N/A'}`;
                     list.appendChild(li);
                     return;
                 }
-                // Only show bookings whose "to" time is in the future
                 if (endDateTime > nowWithBuffer) {
                     const fromIdx = bus.stops.indexOf(b.from_stop);
-                    let fromTime = bus.time; // fallback to bus start time
+                    let fromTime = bus.time;
                     if (fromIdx !== -1 && bus.schedule[fromIdx]) {
                         fromTime = bus.schedule[fromIdx];
                     }
                     const li = document.createElement('li');
                     li.innerText = `Bus: ${getBusDisplay(b.bus)}, Date: ${b.date}, From: ${b.from_stop} (${fromTime}), To: ${b.to_stop}, Seat: ${b.seat || 'N/A'}`;
 
-                    // Add cancel button
                     const cancelBtn = document.createElement('button');
                     cancelBtn.innerText = 'Cancel';
                     cancelBtn.style.marginLeft = '10px';
@@ -301,7 +292,7 @@ function loadBookings() {
             });
         });
 
-    // Also fetch all bookings for the selected bus/date to mark booked seats
+    // Fetch all bookings for the selected bus/date to mark booked seats
     const bus = document.getElementById('bus').value;
     const date = document.getElementById('date').value;
     if (bus && date) {
@@ -360,12 +351,11 @@ document.getElementById('findRoutesBtn').onclick = function () {
         for (const fromIdx of fromIndices) {
             for (const toIdx of toIndices) {
                 if (fromIdx < toIdx) {
-                    // Check if the route is for today and if the "from" stop time is in the past
                     if (date === todayStr) {
                         const fromTime = bus.schedule[fromIdx];
                         const now = new Date();
                         const fromDateTime = new Date(`${date}T${to24Hour(fromTime)}`);
-                        if (fromDateTime < now) continue; // Skip past departures
+                        if (fromDateTime < now) continue;
                     }
                     window.location.href = `routes.html?from=${bus.id}:${fromIdx}&to=${bus.id}:${toIdx}&date=${encodeURIComponent(date)}`;
                     found = true;

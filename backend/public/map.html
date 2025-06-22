@@ -38,19 +38,15 @@
   </div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    // BUP coordinates
     const BUP_COORDS = [23.839547548226214, 90.35778880009767];
 
-    // Initialize map centered on BUP
     var map = L.map('map').setView(BUP_COORDS, 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19
     }).addTo(map);
 
-    // Marker for BUP
     L.marker(BUP_COORDS).addTo(map).bindPopup("BUP (Bangladesh University of Professionals)").openPopup();
 
-    // Marker for Late Shuttle (updates live)
     var busMarker = L.marker([0, 0]).addTo(map).bindPopup("Late Shuttle Bus");
 
     function updateLocation() {

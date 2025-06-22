@@ -2,7 +2,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-let latestLocations = {}; // { busId: {lat, lng, time} }
+let latestLocations = {};
 
 function to24Hour(time12h) {
     const [time, modifier] = time12h.split(' ');
@@ -29,7 +29,6 @@ function processBookingQueue() {
     const { req, res } = bookingQueue.shift();
     const { student_id, bus, date, seat, from, to } = req.body;
 
-    // Check for any future bookings for this student (AGAIN, inside the queue processor)
     db.all('SELECT * FROM bookings WHERE student_id = ?', [student_id], (err, rows) => {
         if (err) {
             processingBooking = false;
@@ -55,7 +54,6 @@ function processBookingQueue() {
             return;
         }
 
-        // Now check if the seat is already booked
         db.get('SELECT * FROM bookings WHERE bus = ? AND date = ? AND seat = ?', [bus, date, seat], (err, row) => {
             if (row) {
                 processingBooking = false;
@@ -82,7 +80,7 @@ function processBookingQueue() {
 
 app.post('/api/gps', (req, res) => {
     const { busId, lat, lng } = req.body;
-    console.log('Received GPS:', busId, lat, lng); // For debugging
+    console.log('Received GPS:', busId, lat, lng);
     if (!busId || !lat || !lng) return res.status(400).json({ error: 'Missing data' });
     latestLocations[busId] = { lat, lng, time: Date.now() };
     res.json({ success: true });
@@ -94,8 +92,6 @@ app.get('/api/gps/:busId', (req, res) => {
     res.json(loc);
 });
 
-// Create tables
-// filepath: /home/presenc6/projects/test/bus-booking-system/backend/app.js
 db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS students (
         id TEXT PRIMARY KEY,
@@ -226,7 +222,6 @@ app.get('/api/buses', (req, res) => {
 
 app.post('/api/register', (req, res) => {
     const { id, password } = req.body;
-    // Only allow s001-s100
     if (!/^s(0[0-9][1-9]|0[1-9][0-9]|100)$/.test(id)) {
         return res.status(400).json({ error: 'Student ID must be from s001 to s100.' });
     }
@@ -263,7 +258,6 @@ app.post('/api/book', (req, res) => {
         return res.status(400).json({ error: 'Missing booking data.' });
     }
 
-    // Find the bus object to get the schedule
     const busObj = buses.find(b => b.id === bus);
     if (!busObj) {
         return res.status(400).json({ error: 'Invalid bus.' });
@@ -273,7 +267,7 @@ app.post('/api/book', (req, res) => {
         return res.status(400).json({ error: 'Invalid stop.' });
     }
 
-    // Check for any future bookings for this student (across all buses)
+    // Check for any future bookings for this student
     db.all('SELECT * FROM bookings WHERE student_id = ?', [student_id], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
 
@@ -291,7 +285,7 @@ app.post('/api/book', (req, res) => {
             return res.status(400).json({ error: 'You already have an active booking. You can only book one bus at a time until your ride has passed.' });
         }
 
-        // Check if student already has a booking for this bus/date/from/to (optional, for clearer error)
+        // Check if student already has a booking for this bus
         db.get(
             'SELECT * FROM bookings WHERE student_id = ? AND bus = ? AND date = ? AND from_stop = ? AND to_stop = ?',
             [student_id, bus, date, from, to],
@@ -300,7 +294,6 @@ app.post('/api/book', (req, res) => {
                 if (row) {
                     return res.status(400).json({ error: 'You have already booked a seat on this bus for this trip.' });
                 }
-                // If no active booking, proceed as before
                 bookingQueue.push({ req, res });
                 processBookingQueue();
             }

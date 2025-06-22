@@ -53,7 +53,6 @@ function showSeating(busId) {
                     renderSeatingChart(bookedSeats);
                 });
 
-            // Attach booking handler
             document.getElementById('bookBtn').onclick = function () {
                 const seat = document.getElementById('selectedSeat').value;
                 if (!seat) {
@@ -83,14 +82,14 @@ function showSeating(busId) {
                             document.getElementById('bookMsg').innerText = data.error;
                         } else {
                             document.getElementById('bookMsg').innerText = 'Booking successful!';
-                            showSeating(busId); // Refresh seating chart
+                            showSeating(busId);
                         }
                     });
             };
         });
 }
 
-// Helper to render seating chart (20 seats, 5 rows x 4 cols)
+// Render seating chart
 function renderSeatingChart(bookedSeats = []) {
     const ROWS = 5, COLS = 4;
     const chart = document.getElementById('seatingChart');
